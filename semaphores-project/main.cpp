@@ -52,7 +52,7 @@ int main(int argc, const char * argv[]) {
     if(pthread_join(parent_id, NULL)) {
         printf("Error Joining Parent Thread\n");
     } else {
-        printf("Parent Thread Joined");
+        printf("Parent Thread Joined\n");
     }
     
     // Destroy Semaphores
@@ -69,13 +69,13 @@ void *parent(void *) {
     if(pthread_create(&producer_id, NULL, producer, NULL)) {
         printf("Error Creating Producer Thread\n");
     } else {
-        printf("Producer Thread Created");
+        printf("Producer Thread Created\n");
     }
     
     if(pthread_create(&consumer_id, NULL, consumer, NULL)) {
         printf("Error Creating Consumer Thread\n");
     } else {
-        printf("Consumer Thread Created");
+        printf("Consumer Thread Created\n");
     }
     
     if(pthread_join(producer_id, NULL)) {
@@ -111,13 +111,13 @@ void *producer(void *) {
  */
     do {
         int num = rand() % 26;
-        char letter = static_cast<char>('A' + num);
-        printf("Producer produced: %c\n", letter);
+        char ran_letter = static_cast<char>('A' + num);
+        printf("Producer produced: %c\n", ran_letter);
         
         sem_wait(&empty);
         sem_wait(&s);
         
-        buffer.push_back(letter);
+        buffer.push_back(ran_letter);
         
 
         sem_post(&s);
@@ -159,10 +159,80 @@ Until false
         sem_post(&empty);
         
         if(position % 2 != 0){
-            printf("Consumer consumed: %s\n", c.c_str());
+            printf("Consumer: %s\n", c.c_str());
         }
         if(position % 2 == 0 && position != -64) {
-            printf("Consumer consumed: %s at position %d\n", c.c_str(), position);
+            char letter = c.front();
+            string s;
+            string t;
+            char v1 = ' ';
+            char v2 = ' ';
+
+            int v1_distance;
+            int v2_distance;
+            
+            
+            
+            switch(letter) {
+                case 'B':
+                case 'D':
+                    v1 = 'A';
+                    v2 = 'E';
+                    break;
+                case 'F':
+                case 'H':
+                    v1 = 'E';
+                    v2 = 'I';
+                    break;
+                case 'J':
+                case 'L':
+                case 'N':
+                    v1 = 'I';
+                    v2 = 'O';
+                    break;
+                case 'P':
+                case 'R':
+                case 'T':
+                    v1 = 'O';
+                    v2 = 'U';
+                    break;
+                case 'V':
+                case 'X':
+                case 'Z':
+                    v1 = 'U';
+                    v2 = 'A';
+                    break;
+                    
+            }
+            
+            s.push_back(v1);
+            s += letter;
+            s.push_back(v2);
+            
+            v1_distance = (static_cast<int>(letter) - 64) - (static_cast<int>(v1) - 64);
+            v2_distance = (static_cast<int>(v2) - 64) - (static_cast<int>(letter) - 64);
+            
+            if(letter == 'V' || letter == 'X' || letter == 'Z'){
+                int vowelA = 27;
+                v2_distance = vowelA - (static_cast<int>(letter) - 64);
+                
+            }
+            if(v1_distance == v2_distance) {
+                t.push_back(v2);
+                t += s;
+                t.push_back(v2);
+                printf(" c: %c, v1: %c, v2: %c, S: %s, T: %s, Distance of c from v1: %d, Distance of c from v2: %d, Distance are the same\n", letter, v1, v2, s.c_str(), t.c_str(), v1_distance, v2_distance);
+            }else if(v1_distance < v2_distance) {
+                t.push_back(v2);
+                t += s;
+                t.push_back(v2);
+                printf(" c: %c, v1: %c, v2: %c, S: %s, T: %s, Distance of c from v1: %d, Distance of c from v2: %d, Larger of the two %c\n", letter, v1, v2, s.c_str(), t.c_str(), v1_distance, v2_distance, v2);
+            }else {
+                t.push_back(v1);
+                t += s;
+                t.push_back(v1);
+                printf(" c: %c, v1: %c, v2: %c, S: %s, T: %s, Distance of c from v1: %d, Distance of c from v2: %d, Larger of the two %c\n", letter, v1, v2, s.c_str(), t.c_str(), v1_distance, v2_distance, v1);
+            }
         }
     }while(TRUE);
     
